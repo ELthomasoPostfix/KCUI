@@ -26,13 +26,16 @@ Note that the .NET framework is a Windows specific implementation, and is not th
 
 We require **MelonLoader v0.5.7** to be set up for *Kingdom: Classic*. We tested some newer and or older versions of MelonLoader, but they seemed to not be compatible.
 The basic workflow of modding is as follows.
-1) Install the MelonLoader installer program.
+1) Install the [MelonLoader installer](https://melonwiki.xyz/#/?id=automated-installation) program.
 2) Install MelonLoader v0.5.7 for *Kingdom: Classic*.
 3) Launch *Kingdom: Classic* once via Steam to properly setup MelonLoader for the game.
-4) Copy and Paste the mod `.dll` into the `Kingdom/Mods`.
+4) Copy and Paste the mod `.dll` into the `Kingdom/Mods` directory of the Steam installation.
 5) Launch *Kingdom: Classic* again via steam. The mod should now be loaded.
 
-Then, to configure Rider, add the following references to `Dependencies/Assemblies` of the Rider Solution tab's file tree, by right clicking on `Assemblies` and selecting the `Reference...` button. For the sake of consistency during developent (i.e. the `.csproj` file depends on it), copy the following `.dll` files to the `assemblies/` directory in this project. Note that the `.gitignore` should exclude the `assemblies/` directory from commits to the repo! We should not (or are not allowed to) host these assemblies.
+For the sake of consistency during development using Rider (i.e. the `.csproj` file depends on it),
+copy the following `.dll` files to the `assemblies/` directory in this project.
+Note that the `.gitignore` should exclude the `assemblies/` directory from commits to the repo!
+We should not (or are not allowed to) host these assemblies publicly.
 ```bash
 
 # Add MelonLoader dependencies, for patching the original .dll.
@@ -57,11 +60,11 @@ Also see [this tutorial](https://steamcommunity.com/sharedfiles/filedetails/?id=
 
 Because *Kingdom: Classic*, as available on steam, was developed using Unity and compiled for the Mono runtime, we can simply use [dnSpy](https://github.com/dnSpy/dnSpy) to decompile `Assembly-CSharp.dll`. This allows us to inspect the game's internals. With regards to the local Steam installation, dnSpy is specifically looking for `\home\user\.local\share\Steam\steamapps\common\Kingdom\Kingdom_Data\Managed\Assembly-CSharp.dll`.
 
-Additionally, using [AssetRipper](https://github.com/AssetRipper/AssetRipper) we can uncompress the Unity asset files, to get a better idea which in-code classes correspond to which in-game entities, by comparing the naming scheme of the assets (mainly the `.png` sprite maps) with the class names. The decompilation process with dnSpy does not yield meaningful comments, so this extra step provides clarity. With regards to the local Steam installation, AssetRipper is specifically looking for all files located at `\home\user\.local\share\Steam\steamapps\common\Kingdom\Kingdom_Data\`. Particularly, the `.assets` files should contain the spite maps. run AssetRipper, and click `File > Open Folder` at the path mentioned above. Then click `View Loaded Files`, which should list `Sprite Data Storage` under the heading Collection. Now, clicking `Export > Export All Files > Export Primary Content` should dump all assets, including the sprites, to the chosen output directory.
+Additionally, using [AssetRipper](https://github.com/AssetRipper/AssetRipper) we can uncompress the Unity asset files, to get a better idea which in-code classes correspond to which in-game entities, by comparing the naming scheme of the assets (mainly the `.png` sprite maps) with the class names. The decompilation process with dnSpy does not yield meaningful comments, so this extra step provides clarity. With regards to the local Steam installation, AssetRipper is specifically looking for all files located at `\home\user\.local\share\Steam\steamapps\common\Kingdom\Kingdom_Data\`. Particularly, the `.assets` files should contain the spite maps. run AssetRipper, and click `File > Open Folder` at the path mentioned above. Then click `View Loaded Files`, which should list `Sprite Data Storage` under the heading *Collection*. Now, clicking `Export > Export All Files > Export Primary Content` should dump all assets, including the sprites, to the chosen output directory.
 
 This approach rests on lawful interoperability - creating a mod that works with the game - while respecting both DMCA and EU rules. As such, **we do not distribute any of the original game files, uncompressed assets, decompiled source code, nor parts thereof, all legally obtained by purchasing a copy of *Kingdom: Classic* through Steam, in this repository.**
 
-Any further discussion targets the Steam version v1.2.0 (R290) (Build ID 1062187) of *Kingdom: Classic* (App ID 368230). Also see [SteamDB](https://steamdb.info/app/368230/patchnotes/).
+Any further discussion targets the Steam version of *Kingdom: Classic* (App ID 368230) v1.2.0 (R290) (Build ID 1062187). Also see [SteamDB](https://steamdb.info/app/368230/patchnotes/).
 
 # Existing Mods
 
