@@ -2,7 +2,22 @@
 
 This section provides some documentation for the classes that result from decompiling `Assembly-CSharp.dll` of *Kingdom: Classic* using dnSpy.
 
-**Note to self**: This section should not copy any code snippets that result from the decompilation.
+**Note to self**: Never copy any code snippets that result from the decompilation.
+
+## Unity Prefabs
+
+Prefabs in Unity form the templates from which GameObjects can be instantiated so that they have common default attributes.
+
+AssetRipper can be used to determine which prefabs the game depends on. Use AssetRipper to import `\home\user\.local\share\Steam\steamapps\common\Kingdom\Kingdom_Data\`. Then, under `Bundles > Generated Hierarchy Assets > Collections > Generated Prefabs` you will find a list of all prefabs that AssetRipper extracted. Note that you should indeed import the entire `Kingdom_Data/` directory, because AssetRipper requires the meta-data stored in the bundled assets to determine what the *original path* used to be before compilation. When not working with the Unity editor, but instead creating pure c# modifications of the decompiled source code, you may not always have easy access to a prefab reference as you would with the Unity inspector. Thus, knowing the original path of the prefabs at runtime allows us to manually load any prefab.
+
+For example, if we only import the file `Kingdom_Data/resources.assets` into AssetRipper then `Bundles > Generated Hierarchy Assets > Collections > Generated Prefabs` lists `Archer` as a prefab. However, due to lacking metadata the prefab only specifies `Override Path: Assets/GameObject/Archer` but does not specify a `Original Path` attribute. On the othe hand, importing the entire `Kingdom_Data/` directory into AssetRipper reveals that `Original Path: Assets/Resources/prefabs/characters/Archer` for the `Archer` prefab. In other words, the meta-data stored by Unity reveals that we may obtain the archer prefab at runtime by making use of the `Resources.Load` function as follows.
+
+```c#
+Resources.Load<Archer>("prefabs/characters/Archer")
+```
+
+Note that the load function is always relative to all subdirectories named `Resources` of the `Assets` directory. Thus, we pass `"prefabs/characters/Archer"` to `Resources.Load` because `"Assets/Resources/"` is implicitly prepended to the search path. See [the Unity docs](https://docs.unity3d.com/ScriptReference/Resources.Load.html).
+
 
 ## World
 
@@ -111,6 +126,28 @@ bool | `spawnOnBothSides, useOuterSpawners, special`
 A `Wave` object simply specifies the counts of each enemy type that should be spawned in a particular wave. Actually instantiating the required enemy objects seems to happen by invoking `List<EnemyBlueprint> EnemyManager::GetEnemies(Wave, int, bool)` given a `Wave` object as a recipe, to generate a list `List<EnemyBlueprint>` of actual enemy objects. Though at that point, the enemies have not yet been added to the scene.
 
 Namely, the method `void EnemyManager::SpawnWave(Wave, int, Side)` is the API for spawning a `Wave`, meaning it takes a `Wave` as input, then invokes `EnemyManager::GetEnemies` given that wave to instantiate the enemies, and passes the resulting list to a particular `Portal` object (the closest portal given a left/right kingdom side) by invoking the spawner function `void Portal::SpawnEnemies(ICollection<EnemyBlueprint>, bool)` to queue that list of enemies for spawning. Note that `Portal::HandleOnDeath` and `Portal::SpawnDefenseWave` directly invoke `Portal::SpawnEnemies`, bypassing `EnemyManager::SpawnWave`.
+
+A wave is either spawned on both sides simultaneously, or on one side at a time. The function `EnemyManager::SpawnWave` is invoked by two functions to implement spawning a wave on one or two sides.
+
+1. `DirectorEvent::Execute(float)` invokes `EnemyManager::SpawnWave` iff. `DirectorEvent.type == DirectorEvent.Type.SpawnWave`. The method `List<DirectorEvent> Day::EventsWave(Wave,int)` returns a list containing an event of type `DirectorEvent.Type.ScheduleWave` for each side that a wave should be spawned on.
+    - **Both sides**: If `Wave.spawnOnBothSides == true` then `Day::EventsWave(Wave,int)` returns a list of *two* `DirectorEvent.Type.ScheduleWave` events so that a wave is scheduled for both the left and right side simultaneously.
+    - **One side**: If `Wave.spawnOnBothSides == false` then `Day::EventsWave(Wave,int)` returns a list of *one* `DirectorEvent.Type.ScheduleWave` event. It performs a 50/50 coin flip to randomly, uniformly decide which of the two sides (right xor left) the wave should spawn at.
+1. `EnemyManager::SpawnWaveImmediate(Wave)` always invokes `EnemyManager::SpawnWave` directly instead of relying on `DirectorEvent` objects!
+    - **Both sides**: If `Wave.spawnOnBothSides == true` then `void EnemyManager::SpawnWaveImmediate(Wave)` spawns a wave on both the left and right sides simultaneously.
+    - **One side**: If `Wave.spawnOnBothSides == false` then `void EnemyManager::SpawnWaveImmediate(Wave)` performs a 50/50 coin flip to randomly, uniformly decide which of the two sides (right xor left) the wave should spawn at.
+
+
+The results of the coin flips are indeed uniformly distributed, because they are implemented as the check `Random.value < 0.5f`, and [Random.value](https://docs.unity3d.com/ScriptReference/Random-value.html) is a Unity api that samples a float in the continuous range $[0, 1]$ for which "*Any given float value between 0.0 and 1.0, including both 0.0 and 1.0, will appear on average approximately once every ten million random samples.*"
+
+## Day
+
+The method `List<DirectorEvent> Day::GenerateEvents(int)` is a central method of the `Day` class. Namely, it schedules a wave iff. its `Day.wave != null`.
+
+The method `void Director::AddCycle()` actually implements the logic of scheduling normal days, bloodmoon days (called "bossDays"), and the safe days after a bloodmoon (called "recoveryDays"). Namely, the method `void Director::AddCycle()` generates a list of days, and on each day individually invokes `void Director::AddDay(Day)`, which in turn calls `List<DirectorEvent> Day::GenerateEvents(int)` to schedule all necessary events for any given `Day` object.
+
+**TODO**: Look deeper into the implementation of `void Director::AddCycle()` to figure out how normal days, bloodmoons and recovery days work! How to work a seed into this???
+
+
 
 ## Chest
 
