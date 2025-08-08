@@ -12,7 +12,7 @@ Note: *Kingdom Two Crowns* is a much more feature rich game than *Kingdom: Class
 
 All trademarks, registered trademarks, product names, and company names or logos mentioned in this project are the property of their respective owners. Use of these names, trademarks, and brands does not imply endorsement.
 
-*KCUI* does not contain or distribute any copyrighted game files from *Kingdom: Classic*. This project contains only original code and content authored by the creator(s) of *KCUI*. Any references to game binaries (such as `Assembly-CSharp.dll`) are strictly for interoperability purposes and must be supplied by the user from their own legally purchased copy of *Kingdom: Classic*.
+*KCUI* does not contain or distribute any copyrighted game files from *Kingdom: Classic*. This project contains only original code and content authored by the creator(s) of *KCUI*. Any references to game binaries (such as `Assembly-CSharp.dll`) are strictly for interoperability purposes and the binaries must be supplied by the user from their own legally purchased copy of *Kingdom: Classic*.
 
 At the time of writing (10 July 2025) the *Kingdom* series fan content policy was last updated on 16 February 2023.
 You can find an archive of this version [here](https://web.archive.org/web/20250620160343/https://www.kingdomthegame.com/fancontentpolicy).
@@ -26,11 +26,13 @@ Note that the .NET framework is a Windows specific implementation, and is not th
 
 We require **MelonLoader v0.5.7** to be set up for *Kingdom: Classic*. We tested some newer and or older versions of MelonLoader, but they seemed to not be compatible.
 The basic workflow of modding is as follows.
-1) Install the [MelonLoader installer](https://melonwiki.xyz/#/?id=automated-installation) program.
-2) Install MelonLoader v0.5.7 for *Kingdom: Classic*.
-3) Launch *Kingdom: Classic* once via Steam to properly setup MelonLoader for the game.
-4) Copy and Paste the mod `.dll` into the `Kingdom/Mods` directory of the Steam installation.
-5) Launch *Kingdom: Classic* again via steam. The mod should now be loaded.
+1. Install the [MelonLoader installer](https://melonwiki.xyz/#/?id=automated-installation) program.
+1. Install MelonLoader v0.5.7 for *Kingdom: Classic*.
+1. Launch *Kingdom: Classic* once via Steam to properly setup MelonLoader for the game.
+1. Copy and Paste the mod `.dll` into the `Kingdom/Mods` directory of the Steam installation.
+1. Download the zip file `json130r3.zip` from the [Newtonsoft.Json github page](https://github.com/JamesNK/Newtonsoft.Json/releases/tag/13.0.3). Copy `/home/Downloads/json130r3/Bin/net20/Newtonsoft.Json.dll` to `Kingdom/UserLibs/Newtonsoft.Json.dll`. (**Steam UserLibs dependency**)
+1. Copy `Kingdom/MelonLoader/Managed/System.Data.dll` to `Kingdom/UserLibs/System.Data.dll`. (**Steam UserLibs dependency**)
+1. Launch *Kingdom: Classic* again via steam. The mod should now be loaded.
 
 For the sake of consistency during development using Rider (i.e. the `.csproj` file depends on it),
 copy the following `.dll` files to the `assemblies/` directory in this project.
@@ -49,6 +51,9 @@ We should not (or are not allowed to) host these assemblies publicly.
 /home/user/.local/share/Steam/steamapps/common/Kingdom/Kingdom_Data/Managed/UnityEngine.dll
 /home/user/.local/share/Steam/steamapps/common/Kingdom/Kingdom_Data/Managed/UnityEngine-UI.dll
 /home/user/.local/share/Steam/steamapps/common/Kingdom/Kingdom_Data/Managed/Rewired_Core.dll
+
+# Add third party dependencies.
+/home/Downloads/json130r3/Bin/net20/Newtonsoft.Json.dll # https://github.com/JamesNK/Newtonsoft.Json/releases/tag/13.0.3
 ```
 Note that `Rewired_Core.dll` takes the place of `UnityEngine.InputModule.dll` and *Kingdom: Classic* does not use `UnityEngine.CoreModule.dll` because it was built using an older version of Unity.
 
