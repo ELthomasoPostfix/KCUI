@@ -39,12 +39,14 @@
         <Reference Include="MelonLoader">
           <HintPath>..\assemblies\MelonLoader.dll</HintPath>
         </Reference>
+        <Reference Include="Newtonsoft.Json">
+          <HintPath>..\assemblies\Newtonsoft.Json.dll</HintPath>
+        </Reference>
         <Reference Include="Rewired_Core">
           <HintPath>..\assemblies\Rewired_Core.dll</HintPath>
         </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
-        <Reference Include="System.Data"/>
         <Reference Include="System.Xml"/>
         <Reference Include="UnityEngine">
           <HintPath>..\assemblies\UnityEngine.dll</HintPath>
